@@ -1,3 +1,5 @@
 # Nota sobre el uso de IA · Parte 2
 
-Un asistente de IA ayudó a adaptar el repositorio anterior de conversación y haiku al prototipo de apertura de siniestros, a separar reglas y mocks del workflow Pipecat, y a redactar tests y documentación. La propuesta se contrastó con el enunciado, la arquitectura de `docs` y el diagrama de flujo proporcionado. Se ejecutaron las pruebas automáticas y el recorrido local. Los servicios de identidad, OTP, póliza y persistencia usan exclusivamente fixtures sintéticos; no se incorporó código de terceros copiado ni se conectaron sistemas reales.
+He utilizado asistentes de código basados en IA como apoyo durante la fase de implementación técnica. La arquitectura del repositorio, el diseño funcional de la solución y la definición del flujo de negocio son de mi autoría intelectual.
+
+El asistente se empleó principalmente para agilizar la escritura de código y validar patrones puntuales, mientras que el diseño de las capas, la lógica de dominio y las decisiones estructurales partieron de mis propios criterios. Todo el código generado fue revisado, adaptado e integrado bajo mi supervisión para garantizar la coherencia técnica del proyecto y asegurar que cada componente pueda ser sustentado y defendido técnicamente
