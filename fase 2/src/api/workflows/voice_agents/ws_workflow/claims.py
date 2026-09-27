@@ -1,7 +1,6 @@
 """Estado privado, precondiciones y transiciones del parte sintético."""
 
 import logging
-from datetime import datetime, timezone
 from uuid import uuid4
 
 from pydantic import ValidationError
@@ -132,28 +131,27 @@ class ClaimsService:
             return self._result("ok", "Parte ya registrado.", "cierre", claim=state["claim"])
         if not state.get("coverage_approved"):
             return self._invalid_step("apertura")
-        request_id = state.setdefault("request_id", str(uuid4()))
+        # Solo correlación de logs; la idempotencia depende de la huella del incidente.
+        state.setdefault("request_id", str(uuid4()))
         payload = {
             "user_id": state["user_data"]["user_id"],
             "policy_id": state["policy"]["policy_id"],
             **state["incident"],
         }
         fingerprint = claim_fingerprint(payload)
-        # La huella identifica posibles duplicados; cada alta candidata necesita
-        # un ID independiente para reconocer cuándo SQLite devuelve otra ya existente.
-        claim_id = "CLM-" + uuid4().hex[:12].upper()
-        created_at = datetime.now(timezone.utc).isoformat()
         try:
-            claim = self._retry(self.repository.create, request_id, claim_id, created_at, payload, fingerprint)
+            result = self._retry(self.repository.create, payload)
+            claim = result["claim"]
+            already_registered = not result["created"]
         except RetryExhausted:
             # Una escritura puede haberse confirmado justo antes de fallar la respuesta.
             try:
-                claim = self._retry(self.repository.get_by_request_id, request_id)
+                claim = self._retry(self.repository.get_by_fingerprint, fingerprint)
             except RetryExhausted:
                 claim = None
             if claim is None:
                 return self._result("dependency_error", "No se pudo confirmar el alta. Reintente o solicite atención humana.", "apertura")
-        already_registered = claim["claim_id"] != claim_id
+            already_registered = True
         state["claim"] = claim
         self._set_closing_message(state, already_registered=already_registered)
         self._event("claim_reused" if already_registered else "claim_created", state)

@@ -8,7 +8,7 @@ Requiere Python 3.13 y `uv`. Desde `fase 2`:
 
 ```powershell
 uv sync
-uv run python demo.py --reset
+uv run python demo.py
 uv run python demo.py --scenario invalid
 uv run python demo.py --scenario uncovered
 uv run python demo.py --scenario contradictory
@@ -18,7 +18,7 @@ uv run python demo.py --scenario failure
 uv run python demo.py --scenario dni_correction
 ```
 
-`demo.py` ejecuta por defecto los siete caminos del enunciado (`--scenario all`): `happy`, `invalid`, `uncovered`, `contradictory`, `correction`, `duplicate` y `failure`. `dni_correction` queda como escenario adicional. Usa el mismo harness que los tests E2E: envía audio sintético al WebSocket real y ejecuta el pipeline, Flow y FlowManager de Pipecat. Los mocks deterministas de STT, LLM y TTS sustituyen solo los proveedores externos; las tools y transiciones se ejecutan realmente. El caso `duplicate` abre dos sesiones sobre la misma SQLite y comprueba que ambas devuelven el mismo ID sin insertar otro expediente. `failure` simula tres fallos de escritura y comprueba que no se anuncia un alta. La elección de acciones del LLM está programada en cada escenario; la demo no evalúa la comprensión de un modelo real. Requiere las dependencias de desarrollo (`uv sync` incluye `pytest`). `--reset` elimina solo el fichero SQLite indicado por `--db`. Los fixtures son `123456`/`111111` con cobertura de colisión, `SYN-200`/`222222` con póliza inactiva, `SYN-300`/`333333` con cobertura de robo y daños por agua, y `SYN-999` inexistente. El OTP y su envío son simulados.
+`demo.py` ejecuta por defecto los siete caminos del enunciado (`--scenario all`): `happy`, `invalid`, `uncovered`, `contradictory`, `correction`, `duplicate` y `failure`. `dni_correction` queda como escenario adicional. Usa el mismo harness que los tests E2E: envía audio sintético al WebSocket real y ejecuta el pipeline, Flow y FlowManager de Pipecat. Los mocks deterministas de STT, LLM y TTS sustituyen solo los proveedores externos; las tools y transiciones se ejecutan realmente. El caso `duplicate` abre dos sesiones sobre la misma SQLite y comprueba que ambas devuelven el mismo ID sin insertar otro expediente. `failure` simula tres fallos de escritura y comprueba que no se anuncia un alta. La elección de acciones del LLM está programada en cada escenario; la demo no evalúa la comprensión de un modelo real. Requiere las dependencias de desarrollo (`uv sync` incluye `pytest`). **Antes de cada escenario, `demo.py` elimina la SQLite indicada por `--db` (por defecto `claims.sqlite3`); se pierden los partes de ejecuciones anteriores.** Los escenarios de `--scenario all` quedan aislados; solo las dos sesiones de `duplicate` comparten la base de ese escenario. Los fixtures son `123456`/`111111` con cobertura de colisión, `SYN-200`/`222222` con póliza inactiva, `SYN-300`/`333333` con cobertura de robo y daños por agua, y `SYN-999` inexistente. El OTP y su envío son simulados.
 
 ## Etapas, tools y transiciones
 
@@ -38,7 +38,11 @@ Al entrar en resumen, una acción `tts_say` comunica el resumen exacto y pide co
 
 Cada operación mock dispone de **tres intentos en total** si lanza una excepción, con `logging.exception` por intento. Esos reintentos técnicos no incrementan los contadores de DNI u OTP. Un NACK normal se devuelve sin repetir la misma operación. Tras tres excepciones de una dependencia se toma la salida de fallo sin anunciar una identidad, cobertura o alta inexistente.
 
-La BBDD mock `claims.sqlite3` conserva expedientes tras reiniciar. La creación es idempotente por `request_id` y, durante una ventana de diez minutos, por el hash de usuario + póliza + fecha del incidente + ubicación + tipo. Descripción y daños son texto libre y no participan en la clave: el reintento puede redactarlos de otra forma sin crear otro expediente. Al abrir una base existente, se recalculan las huellas guardadas con la clave anterior. En esta demo la ubicación también es texto libre; un agente real normalizaría los nombres de localidad antes de calcular la clave. Esta heurística podría agrupar dos incidentes distintos con la misma fecha, ubicación y tipo; haría falta un identificador de evento más preciso para evitarlo. En un reintento reconocido, el cierre indica que el parte ya estaba registrado y comunica el mismo ID. Si no puede confirmarse una escritura, no se anuncia el alta. La sesión Pipecat, incluidos los datos de usuario y la póliza, se pierde al cerrar el WebSocket; no hay Redis ni reanudación entre réplicas.
+### Persistencia e idempotencia
+
+Los partes se guardan en una tabla SQLite con ID, fecha de alta, estado inicial `abierto` y datos del incidente. **Supuesto del prototipo:** usuario + póliza + fecha del incidente + ubicación + tipo identifican un único parte. La huella de esos campos evita duplicados sin límite de tiempo: un reintento devuelve el mismo ID y conserva el relato original, aunque cambien la descripción o los daños. La ubicación se compara literalmente. Dos incidentes reales con esa misma combinación quedarían agrupados; en producción haría falta una clave de evento más precisa.
+
+La demo borra la SQLite antes de cada escenario; las dos sesiones de `duplicate` comparten la base para demostrar la idempotencia. El canal interactivo conserva los expedientes, pero pierde el estado de conversación al cerrar el WebSocket. Una base creada con el esquema anterior requiere una ruta nueva o reiniciar los datos sintéticos con la demo.
 
 ## Privacidad
 

@@ -2,6 +2,7 @@
 
 import argparse
 import sqlite3
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
@@ -183,7 +184,7 @@ def receive_assistant(websocket) -> str:
 
 
 def claim_count(db_path: Path) -> int:
-    with sqlite3.connect(db_path) as connection:
+    with closing(sqlite3.connect(db_path)) as connection:
         return connection.execute("SELECT count(*) FROM claims").fetchone()[0]
 
 
@@ -258,6 +259,8 @@ def run_session(name: str, db_path: Path, *, retry_variant: bool = False):
 def run(name: str, db_path: Path) -> None:
     db_path = db_path.resolve()
     db_path.parent.mkdir(parents=True, exist_ok=True)
+    # Cada escenario empieza vacío; duplicate conserva la base entre sus dos sesiones.
+    db_path.unlink(missing_ok=True)
     if name != "duplicate":
         run_session(name, db_path)
         return
@@ -281,10 +284,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Demo del pipeline Pipecat con STT, LLM y TTS simulados")
     parser.add_argument("--scenario", choices=("all", *REQUIRED_SCENARIOS, "dni_correction"), default="all")
     parser.add_argument("--db", type=Path, default=Path("claims.sqlite3"))
-    parser.add_argument("--reset", action="store_true", help="Borra la base de datos indicada antes de iniciar")
     args = parser.parse_args()
-    if args.reset:
-        args.db.unlink(missing_ok=True)
     scenarios = REQUIRED_SCENARIOS if args.scenario == "all" else (args.scenario,)
     for scenario in scenarios:
         print(f"\n=== {scenario} ===", flush=True)

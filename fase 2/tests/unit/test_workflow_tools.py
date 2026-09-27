@@ -1,15 +1,17 @@
 import logging
-import hashlib
-import json
 import sqlite3
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from datetime import date, datetime, timedelta
+
+import pytest
 
 from pipecat.flows.config import FlowConfig
 from pipecat.flows.flow import Flow
 
 from src.api.workflows.voice_agents.ws_workflow.claims import ClaimsService
 from src.api.workflows.voice_agents.ws_workflow.mocks.services import MockInsuranceServices
-from src.api.workflows.voice_agents.ws_workflow.mocks.repository import ClaimRepository
+from src.api.workflows.voice_agents.ws_workflow.mocks.repository import ClaimRepository, claim_fingerprint
 from src.api.workflows.voice_agents.ws_workflow.tools import FlowTools
 from src.api.workflows.voice_agents.ws_workflow.workflow import FLOW_FILE
 
@@ -184,28 +186,25 @@ def test_claim_needs_coverage_and_deduplicates(tmp_path):
     assert duplicate_result["claim"] == first
     assert duplicate_result["message"] == "Parte ya registrado."
     assert second["closing_message"].startswith("El parte ya estaba registrado.")
-    assert claims.repository.get_by_request_id(second["request_id"]) == first
+    original_payload = claims.repository.get(first["claim_id"])["incident"]
+    assert claims.repository.get_by_fingerprint(claim_fingerprint(original_payload)) == first
     assert claims.repository.get(first["claim_id"])["incident"]["description"] == "Choque leve en cruce"
 
     different_location = {}
     identify(claims, different_location)
     cover(claims, different_location, incident(location="Madrid norte"))
     assert claims.open_claim(different_location)["claim"]["claim_id"] != first["claim_id"]
-    later = (date.today() + timedelta(days=1)).isoformat() + "T00:00:00+00:00"
-    duplicate = claims.repository.create(
-        second["request_id"], "CLM-SHOULD-NOT-EXIST", later,
-        claims.repository.get(first["claim_id"])["incident"], "unused",
-    )
-    assert duplicate == first
+    duplicate = claims.repository.create(original_payload)
+    assert duplicate == {"claim": first, "created": False}
 
 
-def test_new_request_after_dedup_window_can_create_claim(tmp_path, monkeypatch):
+def test_same_incident_remains_unique_after_time_and_restart(tmp_path, monkeypatch):
     claims = service(tmp_path)
     first_state = {}
     identify(claims, first_state)
     cover(claims, first_state)
     first = claims.open_claim(first_state)["claim"]
-    later = datetime.fromisoformat(first["created_at"]) + timedelta(minutes=11)
+    later = datetime.fromisoformat(first["created_at"]) + timedelta(days=30)
 
     class LaterDatetime(datetime):
         @classmethod
@@ -213,27 +212,26 @@ def test_new_request_after_dedup_window_can_create_claim(tmp_path, monkeypatch):
             return later.astimezone(tz) if tz else later.replace(tzinfo=None)
 
     monkeypatch.setattr(
-        "src.api.workflows.voice_agents.ws_workflow.claims.datetime", LaterDatetime
+        "src.api.workflows.voice_agents.ws_workflow.mocks.repository.datetime", LaterDatetime
     )
+    claims = service(tmp_path)
     second_state = {}
     identify(claims, second_state)
     cover(claims, second_state)
     result = claims.open_claim(second_state)
 
     assert result["status"] == "ok"
-    assert result["message"] == "Parte registrado correctamente."
-    assert result["claim"]["claim_id"] != first["claim_id"]
-    assert datetime.fromisoformat(result["claim"]["created_at"]) == later
-    assert claims.repository.get(first["claim_id"]) is not None
-    assert claims.repository.get(result["claim"]["claim_id"]) is not None
-    # Una solicitud antigua conserva su idempotencia incluso fuera de la ventana.
+    assert result["message"] == "Parte ya registrado."
+    assert result["claim"] == first
+    with closing(sqlite3.connect(tmp_path / "claims.sqlite3")) as db:
+        assert db.execute("SELECT count(*) FROM claims").fetchone()[0] == 1
     first_state.pop("claim")
     retry = claims.open_claim(first_state)
     assert retry["claim"] == first
     assert retry["message"] == "Parte ya registrado."
 
 
-def test_existing_fingerprint_is_rebuilt_for_free_text_deduplication(tmp_path):
+def test_reworded_retries_preserve_original_in_single_table(tmp_path):
     claims = service(tmp_path)
     original_state = {}
     identify(claims, original_state)
@@ -241,12 +239,6 @@ def test_existing_fingerprint_is_rebuilt_for_free_text_deduplication(tmp_path):
     original = claims.open_claim(original_state)["claim"]
     database = tmp_path / "claims.sqlite3"
     original_payload = claims.repository.get(original["claim_id"])["incident"]
-    old_fingerprint = hashlib.sha256(
-        json.dumps(original_payload, sort_keys=True, ensure_ascii=False).encode()
-    ).hexdigest()
-    with sqlite3.connect(database) as connection:
-        connection.execute("UPDATE claim_fingerprints SET fingerprint = ?", (old_fingerprint,))
-
     reopened = service(tmp_path)
     retry_state = {}
     identify(reopened, retry_state)
@@ -254,9 +246,54 @@ def test_existing_fingerprint_is_rebuilt_for_free_text_deduplication(tmp_path):
         description="Accidente leve en un cruce",
         damages="Abolladura del parachoques",
     ))
-    assert reopened.open_claim(retry_state)["claim"]["claim_id"] == original["claim_id"]
-    with sqlite3.connect(database) as connection:
+    assert reopened.open_claim(retry_state)["claim"] == original
+    retry_state.pop("claim")
+    assert reopened.open_claim(retry_state)["claim"] == original
+    assert reopened.repository.get(original["claim_id"])["incident"] == original_payload
+    with closing(sqlite3.connect(database)) as connection:
         assert connection.execute("SELECT count(*) FROM claims").fetchone()[0] == 1
+        assert connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall() == [("claims",)]
+
+
+def test_concurrent_creations_return_one_claim(tmp_path):
+    repository = ClaimRepository(tmp_path / "claims.sqlite3")
+    payload = {"user_id": "USR-100", "policy_id": "POL-100", **incident()}
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        results = list(pool.map(repository.create, [payload] * 8))
+    assert sum(result["created"] for result in results) == 1
+    assert len({result["claim"]["claim_id"] for result in results}) == 1
+
+
+def test_old_schema_requires_explicit_reset(tmp_path):
+    database = tmp_path / "claims.sqlite3"
+    with closing(sqlite3.connect(database)) as db, db:
+        db.execute("CREATE TABLE claims (request_id TEXT PRIMARY KEY)")
+        db.execute("INSERT INTO claims VALUES ('old-request')")
+    with pytest.raises(ValueError, match="Esquema SQLite antiguo"):
+        ClaimRepository(database)
+    with closing(sqlite3.connect(database)) as db:
+        assert db.execute("SELECT * FROM claims").fetchall() == [("old-request",)]
+
+
+def test_confirmed_write_is_recovered_by_fingerprint(tmp_path, monkeypatch):
+    claims = service(tmp_path)
+    state = {}
+    identify(claims, state)
+    cover(claims, state)
+    create = claims.repository.create
+    calls = []
+
+    def lost_response(payload):
+        calls.append(create(payload))
+        raise TimeoutError("Respuesta perdida después del commit")
+
+    monkeypatch.setattr(claims.repository, "create", lost_response)
+    result = claims.open_claim(state)
+    assert len(calls) == 3
+    assert sum(call["created"] for call in calls) == 1
+    assert result["route"] == "cierre"
+    assert result["claim"] == calls[0]["claim"]
+    assert result["message"] == "Parte ya registrado."
 
 
 def test_three_exception_attempts_then_failure(tmp_path, monkeypatch):
