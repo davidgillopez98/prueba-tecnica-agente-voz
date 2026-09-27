@@ -1,0 +1,169 @@
+{
+  "initial_node": "identificacion",
+  "nodes": {
+    "identificacion": {
+      "role_message": "Eres un asistente de una aseguradora ficticia. Habla en español y con brevedad. Los datos de User data service y de la póliza se mantienen privados en el servidor. No pidas ni repitas el teléfono o el identificador de usuario. Pide el código OTP para validarlo, pero no lo repitas en voz alta.",
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Etapa 1: identificación. Si aún no has saludado en esta conversación, di primero: {{ welcome_message }} Después pide un DNI sintético y llama a recuperar_datos_usuario. Si no se localiza y seguimos en identificación, pide que repita o corrija el DNI; no generes OTP todavía. Con ACK llama a generar_otp, que usa el teléfono privado. Pide el código recibido y llama a validar_otp. Si el código no se verifica y seguimos en identificación, pide que lo repita y vuelve a llamar a validar_otp; no generes otro OTP ni pidas otro DNI salvo que el usuario indique que el DNI era incorrecto. Si el usuario corrige el DNI, vuelve a recuperar_datos_usuario con el DNI nuevo; así se invalida el reto anterior y se genera otro OTP. Solo el ACK de validar_otp permite pasar a comprobación. Si se agotan los intentos, el flujo pasa a derivación. Si el usuario pide una persona, llama a derivar_a_humano."
+        }
+      ],
+      "functions": [
+        {
+          "name": "recuperar_datos_usuario",
+          "transition_to": {
+            "field": "route",
+            "cases": { "identificacion": "identificacion", "derivacion": "derivacion" },
+            "default": "identificacion"
+          }
+        },
+        {
+          "name": "generar_otp",
+          "transition_to": {
+            "field": "route",
+            "cases": { "identificacion": "identificacion", "derivacion": "derivacion" },
+            "default": "identificacion"
+          }
+        },
+        {
+          "name": "validar_otp",
+          "transition_to": {
+            "field": "route",
+            "cases": { "comprobacion": "comprobacion", "derivacion": "derivacion" },
+            "default": "identificacion"
+          }
+        },
+        {
+          "name": "derivar_a_humano",
+          "transition_only": true,
+          "description": "El usuario pide atención humana o quiere terminar la gestión automática.",
+          "transition_to": "derivacion"
+        }
+      ]
+    },
+    "comprobacion": {
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Etapa 2: comprobación. Recoge fecha AAAA-MM-DD, ubicación general, tipo declarado, descripción y daños. Pide los datos ausentes, aclara contradicciones y confirma que entendiste el relato. Llama primero a categorizar_incidente con los cinco datos. Si devuelve una categoría válida, llama por separado a recuperar_poliza. Esta última tool consulta la póliza privada y comprueba programáticamente la cobertura. Con NACK permanece aquí para aclarar o corregir. Solo el ACK de cobertura permite pasar a apertura. Si el usuario pide una persona, llama a derivar_a_humano."
+        }
+      ],
+      "functions": [
+        {
+          "name": "categorizar_incidente",
+          "transition_to": {
+            "field": "route",
+            "cases": { "comprobacion": "comprobacion", "derivacion": "derivacion" },
+            "default": "comprobacion"
+          }
+        },
+        {
+          "name": "recuperar_poliza",
+          "transition_to": {
+            "field": "route",
+            "cases": { "resumen": "resumen", "derivacion": "derivacion" },
+            "default": "comprobacion"
+          }
+        },
+        {
+          "name": "derivar_a_humano",
+          "transition_only": true,
+          "description": "El usuario pide atención humana o quiere terminar la gestión automática.",
+          "transition_to": "derivacion"
+        }
+      ]
+    },
+    "resumen": {
+      "respond_immediately": false,
+      "pre_actions": [
+        {
+          "type": "tts_say",
+          "text": "Le resumo el incidente: {{ summary_text }} ¿Lo confirma o desea corregirlo?"
+        }
+      ],
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Etapa 3: resumen. El resumen y la pregunta ya se han dicho en voz. Espera la respuesta del usuario. Solo si confirma explícitamente el resumen sin cambios, llama a confirmar_resumen para pasar a apertura. Si corrige, rechaza o la respuesta es ambigua, no confirmes: usa volver_a_comprobacion para corregir y revalidar la póliza, o pide una respuesta clara. Si pide una persona, llama a derivar_a_humano."
+        }
+      ],
+      "functions": [
+        {
+          "name": "confirmar_resumen",
+          "transition_only": true,
+          "description": "El usuario ha confirmado explícitamente y sin cambios el resumen leído; pasar a la etapa de alta.",
+          "transition_to": "apertura"
+        },
+        {
+          "name": "volver_a_comprobacion",
+          "transition_only": true,
+          "description": "El usuario corrige o rechaza el resumen del incidente; vuelve a comprobación para clasificar y verificar cobertura otra vez.",
+          "transition_to": "comprobacion"
+        },
+        {
+          "name": "derivar_a_humano",
+          "transition_only": true,
+          "description": "El usuario pide atención humana o quiere terminar la gestión automática.",
+          "transition_to": "derivacion"
+        }
+      ]
+    },
+    "apertura": {
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Etapa 4: alta. El usuario ya confirmó el resumen en el nodo anterior. Llama a crear_parte una vez. Solo su ACK permite pasar a cierre. Si falla el guardado, comunica el error recuperable sin inventar un identificador y ofrece reintentar o atención humana."
+        }
+      ],
+      "functions": [
+        {
+          "name": "crear_parte",
+          "transition_to": {
+            "field": "route",
+            "cases": { "cierre": "cierre", "derivacion": "derivacion" },
+            "default": "apertura"
+          }
+        },
+        {
+          "name": "derivar_a_humano",
+          "transition_only": true,
+          "description": "El usuario pide atención humana o quiere terminar la gestión automática.",
+          "transition_to": "derivacion"
+        }
+      ]
+    },
+    "cierre": {
+      "respond_immediately": false,
+      "pre_actions": [
+        {
+          "type": "tts_say",
+          "text": "{{ closing_message }}"
+        }
+      ],
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Etapa 5: cierre. El parte ya está guardado y el identificador se ha comunicado mediante una acción de voz. No inventes ni repitas otro identificador. Si el usuario pide una persona, llama a derivar_a_humano."
+        }
+      ],
+      "functions": [
+        {
+          "name": "derivar_a_humano",
+          "transition_only": true,
+          "description": "El usuario pide atención humana, incluso después de abrir el parte.",
+          "transition_to": "derivacion"
+        }
+      ]
+    },
+    "derivacion": {
+      "task_messages": [
+        {
+          "role": "developer",
+          "content": "Ha terminado la gestión automática; informa de que se requiere atención humana o finalizar la llamada. No afirmes una transferencia técnica a Genesys."
+        }
+      ],
+      "functions": []
+    }
+  }
+}

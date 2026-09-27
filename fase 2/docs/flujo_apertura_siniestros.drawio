@@ -1,0 +1,286 @@
+<mxfile host="Electron" agent="draw.io MCP">
+  <diagram id="flujo-siniestros" name="Flujo funcional">
+    <mxGraphModel dx="2414" dy="1394" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="5260" pageHeight="1830" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="background" parent="1" style="fillColor=#FFFFFF;strokeColor=none;" value="" vertex="1">
+          <mxGeometry height="1830" width="5260" as="geometry" />
+        </mxCell>
+        <mxCell id="header" parent="1" style="fillColor=#14243A;strokeColor=none;" value="" vertex="1">
+          <mxGeometry height="150" width="5260" as="geometry" />
+        </mxCell>
+        <mxCell id="header-accent" parent="1" style="fillColor=#48B8C5;strokeColor=none;" value="" vertex="1">
+          <mxGeometry height="4" width="5260" y="146" as="geometry" />
+        </mxCell>
+        <mxCell id="title" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=43;fontColor=#FFFFFF;fontStyle=1;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="Apertura de siniestros · conexiones del flujo" vertex="1">
+          <mxGeometry height="65" width="3000" x="60" y="25" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=23;fontColor=#C7DAE7;fontStyle=0;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="Genesys → WebSocket → agente Pipecat → identificación → comprobación → resumen → apertura → cierre" vertex="1">
+          <mxGeometry height="35" width="4000" x="62" y="92" as="geometry" />
+        </mxCell>
+        <mxCell id="tag" parent="1" style="rounded=1;arcSize=12;fillColor=#213B59;strokeColor=#58758E;strokeWidth=1;html=1;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=24;fontColor=#FFFFFF;fontStyle=1;" value="PARTE 2 · SERVICIOS MOCK" vertex="1">
+          <mxGeometry height="65" width="645" x="4520" y="43" as="geometry" />
+        </mxCell>
+        <mxCell id="system" parent="1" style="rounded=1;arcSize=5;fillColor=#FFFFFF;strokeColor=#A9BDD1;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="1460" width="3690" x="1510" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="system-title" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=28;fontColor=#2B4C6A;fontStyle=1;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="SISTEMA  ·  TOOLS, ESTADO Y PERSISTENCIA" vertex="1">
+          <mxGeometry height="60" width="2400" x="1560" y="213" as="geometry" />
+        </mxCell>
+        <mxCell id="system-note" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=21;fontColor=#536B80;fontStyle=0;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="Cada tool dispone de 3 intentos en total ante excepciones. La siguiente etapa requiere el ACK o la aceptación correspondiente." vertex="1">
+          <mxGeometry height="37" width="3540" x="1560" y="282" as="geometry" />
+        </mxCell>
+        <mxCell id="user" parent="1" style="rounded=1;arcSize=15;fillColor=#FFFFFF;strokeColor=#7192AF;strokeWidth=3;shadow=1;html=1;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=29;fontColor=#19334B;fontStyle=1;" value="USUARIO" vertex="1">
+          <mxGeometry height="160" width="250" x="50" y="897.5" as="geometry" />
+        </mxCell>
+        <mxCell id="genesys" parent="1" style="rounded=1;arcSize=8;fillColor=#E8F0F7;strokeColor=#8EADC6;strokeWidth=3;" value="" vertex="1">
+          <mxGeometry height="480" width="670" x="370" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="genesys-title" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=29;fontColor=#244563;fontStyle=1;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="GENESYS" vertex="1">
+          <mxGeometry height="60" width="580" x="414" y="704" as="geometry" />
+        </mxCell>
+        <mxCell id="genesys-sub" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=21;fontColor=#526C83;fontStyle=0;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="Audio Connector" vertex="1">
+          <mxGeometry height="40" width="580" x="414" y="763" as="geometry" />
+        </mxCell>
+        <mxCell id="wss" parent="1" style="rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#87A5BE;strokeWidth=3;shadow=1;html=1;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=26;fontColor=#19334B;fontStyle=1;" value="CLIENTE WSS" vertex="1">
+          <mxGeometry height="170" width="380" x="514" y="897.5" as="geometry" />
+        </mxCell>
+        <mxCell id="fastapi" parent="1" style="rounded=1;arcSize=14;fillColor=#FFFFFF;strokeColor=#87A5BE;strokeWidth=3;shadow=1;html=1;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=25;fontColor=#19334B;fontStyle=1;" value="FASTAPI · /ws&lt;br&gt;Pipecat / agente" vertex="1">
+          <mxGeometry height="170" width="355" x="1090" y="897.5" as="geometry" />
+        </mxCell>
+        <mxCell id="identity" parent="1" style="rounded=1;arcSize=13;fillColor=#E8F6FA;strokeColor=#237FA6;strokeWidth=3;shadow=1;" value="" vertex="1">
+          <mxGeometry height="365" width="720" x="1580" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="identity-bar" parent="1" style="rounded=0;fillColor=#237FA6;strokeColor=#237FA6;strokeWidth=1;" value="" vertex="1">
+          <mxGeometry height="80" width="720" x="1580" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="identity-title" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=30;fontColor=#FFFFFF;fontStyle=1;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="01  IDENTIFICACIÓN" vertex="1">
+          <mxGeometry height="50" width="664" x="1608" y="815" as="geometry" />
+        </mxCell>
+        <mxCell id="identity-body" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=23;fontColor=#1E354D;fontStyle=0;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="Recibe el DNI y verifica que sea cliente. Obtiene el teléfono registrado y demás datos del usuario para el contexto de sesión. Genera un OTP para ese teléfono y valida el código comunicado por el usuario, sin pasar los datos del servicio al agente." vertex="1">
+          <mxGeometry height="235" width="656" x="1612" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="check" parent="1" style="rounded=1;arcSize=13;fillColor=#F0F1FB;strokeColor=#596DB9;strokeWidth=3;shadow=1;" value="" vertex="1">
+          <mxGeometry height="365" width="720" x="2400" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="check-bar" parent="1" style="rounded=0;fillColor=#596DB9;strokeColor=#596DB9;strokeWidth=1;" value="" vertex="1">
+          <mxGeometry height="80" width="720" x="2400" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="check-title" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=30;fontColor=#FFFFFF;fontStyle=1;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="02  COMPROBACIÓN" vertex="1">
+          <mxGeometry height="50" width="664" x="2428" y="815" as="geometry" />
+        </mxCell>
+        <mxCell id="check-body" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=23;fontColor=#1E354D;fontStyle=0;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="Recoge fecha, ubicación general, tipo, descripción y daños. Detecta datos ausentes o contradictorios y confirma la comprensión. Categoriza el incidente, recupera la póliza y comprueba la cobertura." vertex="1">
+          <mxGeometry height="235" width="656" x="2432" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="opening" parent="1" style="rounded=1;arcSize=13;fillColor=#FFF5E6;strokeColor=#D88A25;strokeWidth=3;shadow=1;" value="" vertex="1">
+          <mxGeometry height="365" width="420" x="3700" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="opening-bar" parent="1" style="rounded=0;fillColor=#D88A25;strokeColor=#D88A25;strokeWidth=1;" value="" vertex="1">
+          <mxGeometry height="80" width="420" x="3700" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="opening-title" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=30;fontColor=#FFFFFF;fontStyle=1;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="04  APERTURA" vertex="1">
+          <mxGeometry height="50" width="364" x="3728" y="815" as="geometry" />
+        </mxCell>
+        <mxCell id="opening-body" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=20;fontColor=#1E354D;fontStyle=0;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="Con aceptación, crea el parte y lo guarda sin duplicados. Solo el ACK permite cerrar." vertex="1">
+          <mxGeometry height="235" width="356" x="3732" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="closure" parent="1" style="rounded=1;arcSize=13;fillColor=#E8F8F2;strokeColor=#299A78;strokeWidth=3;shadow=1;" value="" vertex="1">
+          <mxGeometry height="365" width="760" x="4410" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="closure-bar" parent="1" style="rounded=0;fillColor=#299A78;strokeColor=#299A78;strokeWidth=1;" value="" vertex="1">
+          <mxGeometry height="80" width="760" x="4410" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="closure-title" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=30;fontColor=#FFFFFF;fontStyle=1;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="05  CIERRE" vertex="1">
+          <mxGeometry height="50" width="704" x="4438" y="815" as="geometry" />
+        </mxCell>
+        <mxCell id="closure-body" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=23;fontColor=#1E354D;fontStyle=0;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="Solo tras el ACK del guardado comunica el identificador del parte y sugiere anotarlo. Si el alta es incierta, no anuncia ningún ID." vertex="1">
+          <mxGeometry height="235" width="696" x="4442" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="user-data" parent="1" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fontFamily=Arial;fontSize=21;fontColor=#1F3B52;fillColor=#D9F1F6;strokeColor=#237FA6;strokeWidth=3;shadow=1;" value="&lt;b&gt;User data service&lt;/b&gt;&lt;br&gt;DNI → datos + teléfono registrado" vertex="1">
+          <mxGeometry height="175" width="220" x="1580" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="otp-generate" parent="1" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fontFamily=Arial;fontSize=21;fontColor=#1F3B52;fillColor=#D9F1F6;strokeColor=#237FA6;strokeWidth=3;shadow=1;" value="&lt;b&gt;Generate OTP&lt;/b&gt;&lt;br&gt;teléfono → código y envío simulado" vertex="1">
+          <mxGeometry height="175" width="220" x="1830" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="otp-validate" parent="1" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fontFamily=Arial;fontSize=21;fontColor=#1F3B52;fillColor=#D9F1F6;strokeColor=#237FA6;strokeWidth=3;shadow=1;" value="&lt;b&gt;Validate OTP&lt;/b&gt;&lt;br&gt;teléfono + código OTP → ACK/NACK" vertex="1">
+          <mxGeometry height="175" width="220" x="2080" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="categorize" parent="1" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fontFamily=Arial;fontSize=21;fontColor=#1F3B52;fillColor=#E2E7F7;strokeColor=#596DB9;strokeWidth=3;shadow=1;" value="&lt;b&gt;Categorization incident&lt;/b&gt;&lt;br&gt;definición → categoría" vertex="1">
+          <mxGeometry height="175" width="330" x="2400" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="policy" parent="1" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fontFamily=Arial;fontSize=21;fontColor=#1F3B52;fillColor=#E2E7F7;strokeColor=#596DB9;strokeWidth=3;shadow=1;" value="&lt;b&gt;Get póliza&lt;/b&gt;&lt;br&gt;usuario → póliza/cobertura" vertex="1">
+          <mxGeometry height="175" width="340" x="2780" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="create-parte" parent="1" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fontFamily=Arial;fontSize=21;fontColor=#1F3B52;fillColor=#FCE9CC;strokeColor=#D88A25;strokeWidth=3;shadow=1;" value="&lt;b&gt;Create parte&lt;/b&gt;&lt;br&gt;ID · fecha · estado inicial&lt;br&gt;control de duplicados" vertex="1">
+          <mxGeometry height="175" width="350" x="3710" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="database" parent="1" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=12;fontFamily=Arial;fontSize=21;fontColor=#1F3B52;fillColor=#FCE9CC;strokeColor=#D88A25;strokeWidth=3;shadow=1;" value="&lt;b&gt;BBDD mock&lt;/b&gt;&lt;br&gt;guardar expediente&lt;br&gt;ACK/NACK" vertex="1">
+          <mxGeometry height="175" width="300" x="4090" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="sink-id" parent="1" style="rounded=1;arcSize=13;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=18;fontFamily=Arial;fontSize=22;fontColor=#844539;fontStyle=1;fillColor=#FFF0ED;strokeColor=#DD9A8B;strokeWidth=2;" value="NACK identidad&lt;br&gt;Terminar o escalar a humano" vertex="1">
+          <mxGeometry height="145" width="720" x="1580" y="1350" as="geometry" />
+        </mxCell>
+        <mxCell id="sink-check" parent="1" style="rounded=1;arcSize=13;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=18;fontFamily=Arial;fontSize=22;fontColor=#844539;fontStyle=1;fillColor=#FFF0ED;strokeColor=#DD9A8B;strokeWidth=2;" value="NACK datos / cobertura&lt;br&gt;Aclarar, corregir o escalar" vertex="1">
+          <mxGeometry height="145" width="720" x="2400" y="1350" as="geometry" />
+        </mxCell>
+        <mxCell id="sink-open" parent="1" style="rounded=1;arcSize=13;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=18;fontFamily=Arial;fontSize=22;fontColor=#844539;fontStyle=1;fillColor=#FFF0ED;strokeColor=#DD9A8B;strokeWidth=2;" value="NACK alta / guardado&lt;br&gt;No anunciar ID incierto" vertex="1">
+          <mxGeometry height="145" width="420" x="3700" y="1350" as="geometry" />
+        </mxCell>
+        <mxCell id="handoff" parent="1" style="rounded=1;arcSize=13;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacing=15;fontFamily=Arial;fontSize=23;fontColor=#244563;fontStyle=1;fillColor=#DFEBF4;strokeColor=#8EADC6;strokeWidth=2;" value="Genesys · cerrar llamada&lt;br&gt;o transferir a humano" vertex="1">
+          <mxGeometry height="145" width="355" x="1100" y="1350" as="geometry" />
+        </mxCell>
+        <mxCell id="rules" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=22;fontColor=#37546E;fontStyle=1;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="TRANSICIONES: identidad verificada → cobertura aprobada → resumen aceptado → alta confirmada → cierre" vertex="1">
+          <mxGeometry height="50" width="3500" x="1580" y="1550" as="geometry" />
+        </mxCell>
+        <mxCell id="footer" parent="1" style="rounded=1;arcSize=10;fillColor=#213F60;strokeColor=none;" value="" vertex="1">
+          <mxGeometry height="105" width="5180" x="40" y="1690" as="geometry" />
+        </mxCell>
+        <mxCell id="footer-text" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=24;fontColor=#FFFFFF;fontStyle=1;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="Cierre correcto = ACK de BBDD + identificador del parte    ·    Datos y servicios mock, sin alta productiva" vertex="1">
+          <mxGeometry height="58" width="5070" x="82" y="1710" as="geometry" />
+        </mxCell>
+        <mxCell id="call" edge="1" parent="1" source="user" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="wss" value="llamada">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="wss-to-api" edge="1" parent="1" source="wss" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;exitX=1;exitY=0.35;entryX=0;entryY=0.35;" target="fastapi" value="audio / contexto">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="api-to-wss" edge="1" parent="1" source="fastapi" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#2F8E9E;exitX=0;exitY=0.7;entryX=1;entryY=0.7;" target="wss" value="voz / respuesta">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="api-to-id" edge="1" parent="1" source="fastapi" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="identity" value="inicia flujo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id-to-check" edge="1" parent="1" source="identity" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="check" value="ACK identidad">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="check-to-open" edge="1" parent="1" source="check" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="summary" value="ACK cobertura">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="open-to-close" edge="1" parent="1" source="opening" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="closure" value="ACK guardado">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="user-data-req" edge="1" parent="1" source="identity" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#3B6986;exitX=0.098;exitY=0;entryX=0.32;entryY=1;" target="user-data" value="DNI">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="user-data-res" edge="1" parent="1" source="user-data" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#299A78;exitX=0.68;exitY=1;entryX=0.208;entryY=0;" target="identity" value="datos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="otp-gen-req" edge="1" parent="1" source="identity" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#3B6986;exitX=0.445;exitY=0;entryX=0.32;entryY=1;" target="otp-generate" value="teléfono">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="otp-gen-res" edge="1" parent="1" source="otp-generate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#299A78;exitX=0.68;exitY=1;entryX=0.555;entryY=0;" target="identity" value="ACK">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="otp-val-req" edge="1" parent="1" source="identity" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#3B6986;exitX=0.792;exitY=0;entryX=0.32;entryY=1;" target="otp-validate" value="teléfono + OTP">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="otp-val-res" edge="1" parent="1" source="otp-validate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#299A78;exitX=0.68;exitY=1;entryX=0.902;entryY=0;" target="identity" value="ACK/NACK">
+          <mxGeometry relative="1" x="-0.45" as="geometry" />
+        </mxCell>
+        <mxCell id="category-req" edge="1" parent="1" source="check" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#3B6986;exitX=0.147;exitY=0;entryX=0.32;entryY=1;" target="categorize" value="definición">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="category-res" edge="1" parent="1" source="categorize" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#299A78;exitX=0.68;exitY=1;entryX=0.312;entryY=0;" target="check" value="categoría">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="policy-req" edge="1" parent="1" source="check" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#3B6986;exitX=0.679;exitY=0;entryX=0.32;entryY=1;" target="policy" value="usuario">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="policy-res" edge="1" parent="1" source="policy" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#299A78;exitX=0.68;exitY=1;entryX=0.849;entryY=0;" target="check" value="ACK/NACK">
+          <mxGeometry relative="1" x="-0.0048" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="create-req" edge="1" parent="1" source="opening-bar" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#3B6986;exitX=0.29;exitY=-0.019;entryX=0.32;entryY=1;exitDx=0;exitDy=0;exitPerimeter=0;" target="create-parte" value="datos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="create-res" edge="1" parent="1" source="create-parte" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#299A78;entryX=0.75;entryY=0;entryDx=0;entryDy=0;exitX=0.866;exitY=1.01;exitDx=0;exitDy=0;exitPerimeter=0;" target="opening-bar" value="ACK/NACK">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="4013.11" y="545" />
+              <mxPoint x="4015" y="545" />
+            </Array>
+            <mxPoint x="3842.38" y="550" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="create-to-db" edge="1" parent="1" source="create-parte" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;exitX=1;exitY=0.35;entryX=0;entryY=0.35;" target="database" value="expediente">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="db-to-create" edge="1" parent="1" source="database" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#299A78;exitX=0;exitY=0.75;entryX=1;entryY=0.75;" target="create-parte" value="ACK/NACK">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="otp-to-user" edge="1" parent="1" source="otp-generate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#2793AA;exitX=0.5;exitY=0;entryX=0.5;entryY=0;" target="user" value="OTP al móvil (simulado)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1940" y="330" />
+              <mxPoint x="185" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="correction" edge="1" parent="1" source="summary" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#D08828;dashed=1;exitX=0.2;exitY=1;entryX=0.8;entryY=1;" target="check" value="cambio de accidente · revalidar póliza">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id-nack" edge="1" parent="1" source="identity" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#C76556;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="sink-id" value="NACK">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="check-nack" edge="1" parent="1" source="check" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#C76556;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="sink-check" value="NACK">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="open-nack" edge="1" parent="1" source="opening" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#C76556;dashed=1;exitX=0.7;exitY=1;entryX=0.7;entryY=0;" target="sink-open" value="NACK">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sink-id-handoff" edge="1" parent="1" source="sink-id" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#A77A70;dashed=1;exitX=0.1;exitY=1;entryX=1;entryY=0.65;" target="handoff" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1652.03" y="1625" />
+              <mxPoint x="1480.03" y="1625" />
+              <mxPoint x="1480.03" y="1444.31" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sink-check-handoff" edge="1" parent="1" source="sink-check" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#A77A70;dashed=1;exitX=0.15;exitY=1;entryX=1;entryY=0.75;" target="handoff" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2508.03" y="1635" />
+              <mxPoint x="1480.03" y="1635" />
+              <mxPoint x="1480.03" y="1458.83" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sink-open-handoff" edge="1" parent="1" source="sink-open" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#A77A70;dashed=1;exitX=0.2;exitY=1;entryX=1;entryY=0.85;" target="handoff" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3784" y="1650" />
+              <mxPoint x="1470" y="1650" />
+              <mxPoint x="1470" y="1473.29" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="handoff-to-wss" edge="1" parent="1" source="handoff" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;strokeColor=#A77A70;dashed=1;exitX=0;exitY=0.5;entryX=0.5;entryY=1;" target="wss" value="fin / transferencia">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1000" y="1420" />
+              <mxPoint x="700" y="1420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="summary" parent="1" style="rounded=1;arcSize=13;fillColor=#EDF4FB;strokeColor=#5185AD;strokeWidth=3;shadow=1;" value="" vertex="1">
+          <mxGeometry height="365" width="430" x="3220" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="summary-bar" parent="1" style="rounded=0;fillColor=#5185AD;strokeColor=#5185AD;strokeWidth=1;" value="" vertex="1">
+          <mxGeometry height="80" width="430" x="3220" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="summary-title" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=30;fontColor=#FFFFFF;fontStyle=1;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="03  RESUMEN" vertex="1">
+          <mxGeometry height="50" width="374" x="3248" y="815" as="geometry" />
+        </mxCell>
+        <mxCell id="summary-body" parent="1" style="text;html=1;whiteSpace=wrap;overflow=fill;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=20;fontColor=#1E354D;fontStyle=0;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0;" value="Lee el resumen y pide confirmación. Si hay corrección, vuelve a comprobación y revalida cobertura." vertex="1">
+          <mxGeometry height="235" width="366" x="3252" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="summary-to-opening" edge="1" parent="1" source="summary" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#375977;strokeWidth=3;endArrow=block;endFill=1;fontFamily=Arial;fontSize=19;fontColor=#244159;labelBackgroundColor=#F7F9FC;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="opening" value="aceptación explícita">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
