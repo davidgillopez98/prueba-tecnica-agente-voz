@@ -2,7 +2,7 @@ import logging
 import hashlib
 import json
 import sqlite3
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from pipecat.flows.config import FlowConfig
 from pipecat.flows.flow import Flow
@@ -197,6 +197,40 @@ def test_claim_needs_coverage_and_deduplicates(tmp_path):
         claims.repository.get(first["claim_id"])["incident"], "unused",
     )
     assert duplicate == first
+
+
+def test_new_request_after_dedup_window_can_create_claim(tmp_path, monkeypatch):
+    claims = service(tmp_path)
+    first_state = {}
+    identify(claims, first_state)
+    cover(claims, first_state)
+    first = claims.open_claim(first_state)["claim"]
+    later = datetime.fromisoformat(first["created_at"]) + timedelta(minutes=11)
+
+    class LaterDatetime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return later.astimezone(tz) if tz else later.replace(tzinfo=None)
+
+    monkeypatch.setattr(
+        "src.api.workflows.voice_agents.ws_workflow.claims.datetime", LaterDatetime
+    )
+    second_state = {}
+    identify(claims, second_state)
+    cover(claims, second_state)
+    result = claims.open_claim(second_state)
+
+    assert result["status"] == "ok"
+    assert result["message"] == "Parte registrado correctamente."
+    assert result["claim"]["claim_id"] != first["claim_id"]
+    assert datetime.fromisoformat(result["claim"]["created_at"]) == later
+    assert claims.repository.get(first["claim_id"]) is not None
+    assert claims.repository.get(result["claim"]["claim_id"]) is not None
+    # Una solicitud antigua conserva su idempotencia incluso fuera de la ventana.
+    first_state.pop("claim")
+    retry = claims.open_claim(first_state)
+    assert retry["claim"] == first
+    assert retry["message"] == "Parte ya registrado."
 
 
 def test_existing_fingerprint_is_rebuilt_for_free_text_deduplication(tmp_path):

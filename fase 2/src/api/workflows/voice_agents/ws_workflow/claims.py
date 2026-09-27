@@ -139,7 +139,9 @@ class ClaimsService:
             **state["incident"],
         }
         fingerprint = claim_fingerprint(payload)
-        claim_id = "CLM-" + fingerprint[:12].upper()
+        # La huella identifica posibles duplicados; cada alta candidata necesita
+        # un ID independiente para reconocer cuándo SQLite devuelve otra ya existente.
+        claim_id = "CLM-" + uuid4().hex[:12].upper()
         created_at = datetime.now(timezone.utc).isoformat()
         try:
             claim = self._retry(self.repository.create, request_id, claim_id, created_at, payload, fingerprint)
