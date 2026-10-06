@@ -45,132 +45,327 @@ def incident(**changes) -> dict:
     } | changes
 
 
+def build_happy_case() -> DemoCase:
+    """Identificación, cobertura y alta correcta del parte."""
+    return DemoCase(
+        voice=VoiceScenario(
+            transcripts={
+                b'dni': '123456',
+                b'otp': '111111',
+                b'incident': 'Choque en Madrid',
+                b'confirm': 'Sí, confirmo',
+            },
+            llm_actions=(
+                LLMAction(text=GREETING),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': '123456'}),
+                LLMAction(tool='generar_otp'),
+                LLMAction(text='Indique el código.'),
+                LLMAction(tool='validar_otp', arguments={'verification_value': '111111'}),
+                LLMAction(text='Describa el incidente.'),
+                LLMAction(tool='categorizar_incidente', arguments=incident()),
+                LLMAction(tool='recuperar_poliza'),
+                LLMAction(tool='confirmar_resumen'),
+                LLMAction(tool='crear_parte'),
+            ),
+        ),
+        turns=(b'dni', b'otp', b'incident', b'confirm'),
+        final_node='cierre',
+        expected_tools=(
+            'recuperar_datos_usuario',
+            'generar_otp',
+            'validar_otp',
+            'categorizar_incidente',
+            'recuperar_poliza',
+            'crear_parte',
+        ),
+    )
+
+
+def build_invalid_case() -> DemoCase:
+    """Tres documentos inv?lidos terminan en atenci?n humana."""
+    return DemoCase(
+        voice=VoiceScenario(
+            transcripts={
+                b'bad1': 'SYN-999',
+                b'bad2': 'SYN-999',
+                b'bad3': 'SYN-999',
+            },
+            llm_actions=(
+                LLMAction(text=GREETING),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': 'SYN-999'}),
+                LLMAction(text='Repita el DNI.'),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': 'SYN-999'}),
+                LLMAction(text='Repita el DNI por última vez.'),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': 'SYN-999'}),
+                LLMAction(text='Se requiere atención humana.'),
+            ),
+        ),
+        turns=(b'bad1', b'bad2', b'bad3'),
+        final_node='derivacion',
+        expected_tools=(
+            'recuperar_datos_usuario',
+            'recuperar_datos_usuario',
+            'recuperar_datos_usuario',
+        ),
+    )
+
+
+def build_uncovered_case() -> DemoCase:
+    """La p?liza no cubre el incidente y no se crea un parte."""
+    return DemoCase(
+        voice=VoiceScenario(
+            transcripts={
+                b'dni': 'SYN-300',
+                b'otp': '333333',
+                b'incident': 'Choque en Madrid',
+            },
+            llm_actions=(
+                LLMAction(text=GREETING),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': 'SYN-300'}),
+                LLMAction(tool='generar_otp'),
+                LLMAction(text='Indique el código.'),
+                LLMAction(tool='validar_otp', arguments={'verification_value': '333333'}),
+                LLMAction(text='Describa el incidente.'),
+                LLMAction(tool='categorizar_incidente', arguments=incident()),
+                LLMAction(tool='recuperar_poliza'),
+                LLMAction(text='La póliza no cubre esa clase de incidente.'),
+            ),
+        ),
+        turns=(b'dni', b'otp', b'incident'),
+        final_node='comprobacion',
+        expected_tools=(
+            'recuperar_datos_usuario',
+            'generar_otp',
+            'validar_otp',
+            'categorizar_incidente',
+            'recuperar_poliza',
+        ),
+    )
+
+
+def build_contradictory_case() -> DemoCase:
+    """Se corrige el tipo de incidente antes de consultar la p?liza."""
+    return DemoCase(
+        voice=VoiceScenario(
+            transcripts={
+                b'dni': '123456',
+                b'otp': '111111',
+                b'incident': 'Ayer hubo un choque en Madrid, pero he indicado incendio',
+                b'confirm': 'Sí, confirmo',
+                b'corrected': 'Corrijo el tipo: fue una colisión',
+            },
+            llm_actions=(
+                LLMAction(text=GREETING),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': '123456'}),
+                LLMAction(tool='generar_otp'),
+                LLMAction(text='Indique el código.'),
+                LLMAction(tool='validar_otp', arguments={'verification_value': '111111'}),
+                LLMAction(text='Describa el incidente.'),
+                LLMAction(tool='categorizar_incidente', arguments=incident(incident_type='incendio')),
+                LLMAction(text='El tipo indicado contradice la descripción. ¿Fue una colisión o un incendio?'),
+                LLMAction(tool='categorizar_incidente', arguments=incident()),
+                LLMAction(tool='recuperar_poliza'),
+                LLMAction(tool='confirmar_resumen'),
+                LLMAction(tool='crear_parte'),
+            ),
+        ),
+        turns=(b'dni', b'otp', b'incident', b'corrected', b'confirm'),
+        final_node='cierre',
+        expected_tools=(
+            'recuperar_datos_usuario',
+            'generar_otp',
+            'validar_otp',
+            'categorizar_incidente',
+            'categorizar_incidente',
+            'recuperar_poliza',
+            'crear_parte',
+        ),
+    )
+
+
+def build_correction_case() -> DemoCase:
+    """Se corrige la ubicaci?n y se vuelve a comprobar la cobertura."""
+    return DemoCase(
+        voice=VoiceScenario(
+            transcripts={
+                b'dni': '123456',
+                b'otp': '111111',
+                b'incident': 'Choque en Madrid',
+                b'confirm': 'Sí, confirmo',
+                b'correction': 'No, fue en Madrid norte',
+                b'new_incident': 'Choque en Madrid norte',
+            },
+            llm_actions=(
+                LLMAction(text=GREETING),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': '123456'}),
+                LLMAction(tool='generar_otp'),
+                LLMAction(text='Indique el código.'),
+                LLMAction(tool='validar_otp', arguments={'verification_value': '111111'}),
+                LLMAction(text='Describa el incidente.'),
+                LLMAction(tool='categorizar_incidente', arguments=incident()),
+                LLMAction(tool='recuperar_poliza'),
+                LLMAction(tool='volver_a_comprobacion'),
+                LLMAction(text='Corrijamos la ubicación.'),
+                LLMAction(tool='categorizar_incidente', arguments=incident(location='Madrid norte')),
+                LLMAction(tool='recuperar_poliza'),
+                LLMAction(tool='confirmar_resumen'),
+                LLMAction(tool='crear_parte'),
+            ),
+        ),
+        turns=(b'dni', b'otp', b'incident', b'correction', b'new_incident', b'confirm'),
+        final_node='cierre',
+        expected_tools=(
+            'recuperar_datos_usuario',
+            'generar_otp',
+            'validar_otp',
+            'categorizar_incidente',
+            'recuperar_poliza',
+            'categorizar_incidente',
+            'recuperar_poliza',
+            'crear_parte',
+        ),
+    )
+
+
+def build_duplicate_case(*, retry_variant: bool = False) -> DemoCase:
+    """Dos solicitudes equivalentes deben conservar un ?nico parte."""
+    duplicate_incident = incident(location="Sevilla")
+    if retry_variant:
+        duplicate_incident = incident(
+            location="Sevilla",
+            description="Accidente leve en un cruce",
+            damages="Abolladura del parachoques",
+        )
+    return DemoCase(
+        voice=VoiceScenario(
+            transcripts={
+                b'dni': '123456',
+                b'otp': '111111',
+                b'incident': duplicate_incident["description"],
+                b'confirm': 'Sí, confirmo',
+            },
+            llm_actions=(
+                LLMAction(text=GREETING),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': '123456'}),
+                LLMAction(tool='generar_otp'),
+                LLMAction(text='Indique el código.'),
+                LLMAction(tool='validar_otp', arguments={'verification_value': '111111'}),
+                LLMAction(text='Describa el incidente.'),
+                LLMAction(tool="categorizar_incidente", arguments=duplicate_incident),
+                LLMAction(tool='recuperar_poliza'),
+                LLMAction(tool='confirmar_resumen'),
+                LLMAction(tool='crear_parte'),
+            ),
+        ),
+        turns=(b'dni', b'otp', b'incident', b'confirm'),
+        final_node='cierre',
+        expected_tools=(
+            'recuperar_datos_usuario',
+            'generar_otp',
+            'validar_otp',
+            'categorizar_incidente',
+            'recuperar_poliza',
+            'crear_parte',
+        ),
+    )
+
+
+def build_failure_case() -> DemoCase:
+    """El fallo de persistencia se comunica sin anunciar un alta."""
+    return DemoCase(
+        voice=VoiceScenario(
+            transcripts={
+                b'dni': '123456',
+                b'otp': '111111',
+                b'incident': 'Choque en Madrid',
+                b'confirm': 'Sí, confirmo',
+            },
+            llm_actions=(
+                LLMAction(text=GREETING),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': '123456'}),
+                LLMAction(tool='generar_otp'),
+                LLMAction(text='Indique el código.'),
+                LLMAction(tool='validar_otp', arguments={'verification_value': '111111'}),
+                LLMAction(text='Describa el incidente.'),
+                LLMAction(tool='categorizar_incidente', arguments=incident()),
+                LLMAction(tool='recuperar_poliza'),
+                LLMAction(tool='confirmar_resumen'),
+                LLMAction(tool='crear_parte'),
+                LLMAction(text='No he podido confirmar el alta; puede reintentar o pedir atención humana.'),
+            ),
+        ),
+        turns=(b'dni', b'otp', b'incident', b'confirm'),
+        final_node='apertura',
+        expected_tools=(
+            'recuperar_datos_usuario',
+            'generar_otp',
+            'validar_otp',
+            'categorizar_incidente',
+            'recuperar_poliza',
+            'crear_parte',
+        ),
+    )
+
+
+def build_dni_correction_case() -> DemoCase:
+    """La correcci?n del documento sustituye el reto OTP anterior."""
+    return DemoCase(
+        voice=VoiceScenario(
+            transcripts={
+                b'first': 'SYN-200',
+                b'correction': 'El DNI correcto es 123456',
+                b'otp': '111111',
+                b'incident': 'Choque en Madrid',
+                b'confirm': 'Sí, confirmo',
+            },
+            llm_actions=(
+                LLMAction(text=GREETING),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': 'SYN-200'}),
+                LLMAction(tool='generar_otp'),
+                LLMAction(text='Indique el código o corrija el DNI.'),
+                LLMAction(tool='recuperar_datos_usuario', arguments={'document_id': '123456'}),
+                LLMAction(tool='generar_otp'),
+                LLMAction(text='Indique el nuevo código.'),
+                LLMAction(tool='validar_otp', arguments={'verification_value': '111111'}),
+                LLMAction(text='Describa el incidente.'),
+                LLMAction(tool='categorizar_incidente', arguments=incident()),
+                LLMAction(tool='recuperar_poliza'),
+                LLMAction(tool='confirmar_resumen'),
+                LLMAction(tool='crear_parte'),
+            ),
+        ),
+        turns=(b'first', b'correction', b'otp', b'incident', b'confirm'),
+        final_node='cierre',
+        expected_tools=(
+            'recuperar_datos_usuario',
+            'generar_otp',
+            'recuperar_datos_usuario',
+            'generar_otp',
+            'validar_otp',
+            'categorizar_incidente',
+            'recuperar_poliza',
+            'crear_parte',
+        ),
+    )
+
+
 def build_case(name: str, *, retry_variant: bool = False) -> DemoCase:
-    if name not in (*REQUIRED_SCENARIOS, "dni_correction"):
+    """Selecciona el guion completo del escenario solicitado."""
+    builders = {
+        'happy': build_happy_case,
+        'invalid': build_invalid_case,
+        'uncovered': build_uncovered_case,
+        'contradictory': build_contradictory_case,
+        'correction': build_correction_case,
+        'duplicate': build_duplicate_case,
+        'failure': build_failure_case,
+        'dni_correction': build_dni_correction_case,
+    }
+    if name not in builders:
         raise ValueError(f"Escenario desconocido: {name}")
-    greeting = LLMAction(text=GREETING)
-    identify = LLMAction(tool="recuperar_datos_usuario", arguments={"document_id": "123456"})
-    send_otp = LLMAction(tool="generar_otp")
-    verify_otp = LLMAction(tool="validar_otp", arguments={"verification_value": "111111"})
-    classify = LLMAction(tool="categorizar_incidente", arguments=incident())
-    policy = LLMAction(tool="recuperar_poliza")
-    accept = LLMAction(tool="confirmar_resumen")
-    create = LLMAction(tool="crear_parte")
-    core_tools = ("recuperar_datos_usuario", "generar_otp", "validar_otp", "categorizar_incidente", "recuperar_poliza")
-
-    if name == "invalid":
-        return DemoCase(
-            VoiceScenario(
-                transcripts={b"bad1": "SYN-999", b"bad2": "SYN-999", b"bad3": "SYN-999"},
-                llm_actions=(
-                    greeting,
-                    LLMAction(tool="recuperar_datos_usuario", arguments={"document_id": "SYN-999"}),
-                    LLMAction(text="Repita el DNI."),
-                    LLMAction(tool="recuperar_datos_usuario", arguments={"document_id": "SYN-999"}),
-                    LLMAction(text="Repita el DNI por última vez."),
-                    LLMAction(tool="recuperar_datos_usuario", arguments={"document_id": "SYN-999"}),
-                    LLMAction(text="Se requiere atención humana."),
-                ),
-            ),
-            (b"bad1", b"bad2", b"bad3"),
-            "derivacion",
-            ("recuperar_datos_usuario",) * 3,
-        )
-
-    if name == "uncovered":
-        return DemoCase(
-            VoiceScenario(
-                transcripts={b"dni": "SYN-300", b"otp": "333333", b"incident": "Choque en Madrid"},
-                llm_actions=(
-                    greeting,
-                    LLMAction(tool="recuperar_datos_usuario", arguments={"document_id": "SYN-300"}),
-                    send_otp,
-                    LLMAction(text="Indique el código."),
-                    LLMAction(tool="validar_otp", arguments={"verification_value": "333333"}),
-                    LLMAction(text="Describa el incidente."),
-                    classify,
-                    policy,
-                    LLMAction(text="La póliza no cubre esa clase de incidente."),
-                ),
-            ),
-            (b"dni", b"otp", b"incident"),
-            "comprobacion",
-            core_tools,
-        )
-
-    prefix = (greeting, identify, send_otp, LLMAction(text="Indique el código."), verify_otp,
-              LLMAction(text="Describa el incidente."), classify, policy)
-    transcripts = {b"dni": "123456", b"otp": "111111", b"incident": "Choque en Madrid", b"confirm": "Sí, confirmo"}
-    turns = (b"dni", b"otp", b"incident", b"confirm")
-    actions = prefix + (accept, create)
-    expected_tools = core_tools + ("crear_parte",)
-
-    if name == "correction":
-        transcripts |= {b"correction": "No, fue en Madrid norte", b"new_incident": "Choque en Madrid norte"}
-        turns = (b"dni", b"otp", b"incident", b"correction", b"new_incident", b"confirm")
-        actions = prefix + (
-            LLMAction(tool="volver_a_comprobacion"),
-            LLMAction(text="Corrijamos la ubicación."),
-            LLMAction(tool="categorizar_incidente", arguments=incident(location="Madrid norte")),
-            policy, accept, create,
-        )
-        expected_tools = core_tools + ("categorizar_incidente", "recuperar_poliza", "crear_parte")
-
-    if name == "contradictory":
-        transcripts |= {
-            b"incident": "Ayer hubo un choque en Madrid, pero he indicado incendio",
-            b"corrected": "Corrijo el tipo: fue una colisión",
-        }
-        turns = (b"dni", b"otp", b"incident", b"corrected", b"confirm")
-        actions = prefix[:-2] + (
-            LLMAction(tool="categorizar_incidente", arguments=incident(incident_type="incendio")),
-            LLMAction(text="El tipo indicado contradice la descripción. ¿Fue una colisión o un incendio?"),
-            classify, policy, accept, create,
-        )
-        expected_tools = core_tools[:3] + ("categorizar_incidente", "categorizar_incidente", "recuperar_poliza", "crear_parte")
-
     if name == "duplicate":
-        duplicate_incident = incident(location="Sevilla")
-        if retry_variant:
-            duplicate_incident = incident(
-                location="Sevilla",
-                description="Accidente leve en un cruce",
-                damages="Abolladura del parachoques",
-            )
-        transcripts[b"incident"] = duplicate_incident["description"]
-        actions = prefix[:-2] + (
-            LLMAction(tool="categorizar_incidente", arguments=duplicate_incident),
-            policy, accept, create,
-        )
-
-    if name == "failure":
-        actions = prefix + (
-            accept, create,
-            LLMAction(text="No he podido confirmar el alta; puede reintentar o pedir atención humana."),
-        )
-        return DemoCase(VoiceScenario(transcripts=transcripts, llm_actions=actions), turns, "apertura", expected_tools)
-
-    if name == "dni_correction":
-        transcripts = {
-            b"first": "SYN-200", b"correction": "El DNI correcto es 123456",
-            b"otp": "111111", b"incident": "Choque en Madrid", b"confirm": "Sí, confirmo",
-        }
-        turns = (b"first", b"correction", b"otp", b"incident", b"confirm")
-        actions = (
-            greeting,
-            LLMAction(tool="recuperar_datos_usuario", arguments={"document_id": "SYN-200"}),
-            send_otp,
-            LLMAction(text="Indique el código o corrija el DNI."),
-            identify,
-            send_otp,
-            LLMAction(text="Indique el nuevo código."),
-            verify_otp,
-            LLMAction(text="Describa el incidente."),
-            classify, policy, accept, create,
-        )
-        expected_tools = ("recuperar_datos_usuario", "generar_otp") + core_tools + ("crear_parte",)
-
-    return DemoCase(VoiceScenario(transcripts=transcripts, llm_actions=actions), turns, "cierre", expected_tools)
+        return build_duplicate_case(retry_variant=retry_variant)
+    return builders[name]()
 
 
 def receive_assistant(websocket) -> str:
@@ -207,7 +402,7 @@ def run_session(name: str, db_path: Path, *, retry_variant: bool = False):
             llm__model="fake-model",
             llm__endpoint="localhost:11434/api",
             claims_db_path=db_path,
-            log_level="CRITICAL",
+            log_level="WARNING",
         )
         patch.setattr(main_module, "get_settings", lambda: settings)
         patch.setattr(
